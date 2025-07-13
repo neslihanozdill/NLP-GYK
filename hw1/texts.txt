@@ -1,0 +1,5 @@
+This is the first sample text for NLP preprocessing.
+Natural language processing is a fascinating field of study.
+Machine learning and artificial intelligence are transforming the world.
+Text analysis and sentiment analysis are important applications.
+Python is a powerful programming language for data science.

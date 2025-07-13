@@ -1,0 +1,101 @@
+import nltk
+nltk.download('punkt_tab')
+
+text = "Natural Language Processing is a branch of artificial intelligence."
+
+from nltk.tokenize import word_tokenize #tokenize kelimelere ya da cümlelere ya da anlamlı küçük parçalara ayırır 
+
+tokens = word_tokenize(text) #kelimelere ayırır
+print(tokens)
+from nltk.corpus import stopwords
+nltk.download('stopwords') #Stopword, bir dilde çok sık geçen ama çoğu zaman analizde anlamsal katkısı az olan kelimelerdir Burada önemli kelimeler: yazı, paylaşmak
+#Stopword olanlar: bu, seninle, istedim
+
+stop_words = set(stopwords.words('english')) #dosyadaki kelimeleri okur
+filtered_tokens = [word for word in tokens if word not in stop_words]
+""" The following code creates a  filtered list of tokens by removing stop words. parantez içindekinin uzun hali
+# filtered = []
+# for word in tokens:
+#     if word not in stop_words:
+#         filtered.append(word)"""
+
+print(filtered_tokens)
+
+#Lemmatization: kelimelerin temel formunu bulur. kök haline getirir.
+#running -> run
+from nltk.stem import WordNetLemmatizer
+nltk.download('wordnet')
+lemmatizer = WordNetLemmatizer()
+print(lemmatizer.lemmatize("running" , pos="v")) #part of speech v: verb, n: noun, a: adjective, r: adverb o an lemmetize ettiğimiz kelimenin türünü belirler 
+
+#metin sınıflandırma işlemi için arama motorunda çokça kullanılır
+nltk.download('averaged_perceptron_tagger_eng') # average per.tagger->Bu, cümledeki her kelimenin isim mi, fiil mi, sıfat mı olduğunu tahmin eden bir makine öğrenmesi algoritmasıdır.
+from nltk import pos_tag 
+pos_tags= pos_tag(filtered_tokens)
+print(pos_tags)
+#ı am running derken [('I', 'PRP'), ('am', 'VBP'), ('running', 'VBG')]  şeklinde sınıflar kelimeleri average perception tagger
+
+nltk.download('maxent_ne_chunker_tab')
+nltk.download('words')
+
+from nltk import ne_chunk #named entity recognition
+tree = ne_chunk(pos_tags)
+print(tree)
+
+#Metin temizleme ve ön işleme 
+#Lowercading: büyük harfleri küçük harfe çevirir.
+
+text = "Natural Language Processing is a branch of artificial intelligence. 100%"
+text = text.lower()
+print(text)
+ #noktalama işaretlerini kaldırır
+import re
+text = re.sub(r'[^\w\s]', '', text) #\w: kelime karakteri, \s: boşluk karakteri, ^: başlangıç, $: bitiş re->regular expression
+print(text)
+#sayıları kaldırır.
+text = re.sub(r'\d+', '', text) #\d: sayı karakteri, +: bir veya daha fazla sayı karakteri
+print(text)
+
+#vectorization: metinleri sayısal değerlere çevirir.
+corpus = ["I love programming", "I love natural language processing", "I love artificial intelligence", "I love python"]
+#bag of words modeli vektörize modelidir
+from sklearn.feature_extraction.text import CountVectorizer
+#CountVectorizer, kelimelerin kaç kez geçtiğini sayan bir vektör üreticidir.
+#Metindeki her kelimeyi bir özellik (feature) olarak kabul eder.
+#Örneğin, "I love programming" metninde "I", "love", "programming" kelimeleri özellikler olarak kabul edilir.
+#Bu özelliklerin sayısal değerleri, metinlerin sayısal temsillerini oluşturur.
+
+vectorizer = CountVectorizer()
+#vectorizer adında bir nesne oluşturuyorsun.
+#Henüz metne uygulamadın, sadece aracı tanımladın.
+
+X = vectorizer.fit_transform(corpus)
+#fit_transform şunu yapar:
+#fit: Tüm kelimeleri öğrenir (sözlük oluşturur).
+#transform: Her cümleyi bir kelime sayısı vektörüne çevirir.
+print(vectorizer.get_feature_names_out()) #kelimeleri görüntüler
+print(X.toarray())
+# X bir sparse matrix (seyrek matris) nesnesidir.
+# toarray() onu tam görünümlü bir 2D NumPy dizisine çevirir.
+# Her satır = bir cümle
+# Her sütun = bir kelime
+# Her hücre = o kelimenin o cümlede kaç kez geçtiği
+print("--------------------------------------------")
+#tf-idf modeli vektörize modelidir term frequency-inverse document frequency modelidir
+#tf: bir kelimenin bir cümlede kaç kez geçtiği
+#idf: bir kelimenin kaç cümlede geçtiği
+#tf-idf: bir kelimenin bir cümlede kaç kez geçtiği ve kaç cümlede geçtiği, nadirliği
+from sklearn.feature_extraction.text import TfidfVectorizer
+vectorizer2 = TfidfVectorizer()
+X2 = vectorizer2.fit_transform(corpus)
+print(vectorizer2.get_feature_names_out()) #kelimeleri görüntüler
+print(X2.toarray())
+#değeri bie yakınsa o kelime o cümlede çok önemli demektir.
+#değeri 0 ise o kelime o cümlede hiç geçmemiş demektir.
+
+
+
+
+
+
+
